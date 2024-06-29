@@ -1,0 +1,13 @@
+@Library('sharedlib') _
+pipeline {
+agent any
+  stages {
+    stage ('build') {
+        steps {
+            script { 
+                build name: 'statngx' 
+                }
+            }
+        }
+    }
+}
