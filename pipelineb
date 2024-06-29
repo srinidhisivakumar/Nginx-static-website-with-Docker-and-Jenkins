@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+    environment {
+      PATH = "/usr/local/bin:$PATH"
+    }
+  stages {
+    stage ('Prepare') {
+      steps {
+        checkout scm
+      }
+    }
+    stage ('Build and Publish Image') {
+            steps {
+                sh ('./stat-ngx.sh')
+            }
+        }
+    }
+  post {
+    always {
+       mail to: 'srinidhi.srinidhi544@gmail.com', subject: "Status of pipeline: ${currentBuild.fullDisplayName}", body: "${env.BUILD_URL} has result ${currentBuild.result}"
+      }
+    } 
+  }
