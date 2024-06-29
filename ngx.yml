@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  stat-web-ngx:
+    image: "${customImage}"
+    ports:
+      - 6080:80
+            
