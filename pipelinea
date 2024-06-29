@@ -1,0 +1,59 @@
+@Library('sharedlib') _
+pipeline {
+    agent any
+    environment {
+      PATH = "/usr/local/bin:$PATH"
+      customImage = ''
+    }  
+  stages {
+    stage ('Prepare') {
+      steps {
+        checkout scm
+      }
+    }
+    stage ('Build') {
+      input{
+        message "Press Ok to continue"
+        submitter "admin"
+        parameters {
+        string(name:'username', defaultValue: 'user', description: 'Username of the user pressing Ok')
+              }
+          }
+      steps {
+        script {
+          customImage = docker.build("sri96/stat:${env.BUILD_ID}")
+               }
+            }
+        }
+      stage ('Push') {
+        steps {
+          script {
+            docker.withRegistry('', '6d60c055-4a28-42af-ab6a-4d313d39b707') {
+            customImage.push()
+                    }
+                  }
+                }
+              }
+      stage ('Deploy') {
+        steps {
+          script {
+            build_statngx()
+            sleep(60)
+                  }
+              }
+          }
+      stage ('Update') {
+        steps {
+          script {
+            update_statngx()
+            sleep(60)
+                }
+             }
+          }
+        }  
+  post {
+    failure {
+      rollback_statngx()
+        }
+     }     
+  }   
